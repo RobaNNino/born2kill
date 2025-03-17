@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Born2Kill - CS 1.6 Zombie Plague Mod Community</title>
+    <style>
+        :root {
+            --primary: #ffffff;
+            --secondary: #222;
+            --accent: #888;
+            --bg-dark: #000000;
+            --bg-light: #1a1a1a;
+            --text: #eee;
+            --text-muted: #aaa;
+            --border: #333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        a:hover {
+            color: var(--primary);
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        /* Extreme Glitch Effect */
+        .broken-pixel-container {
+            position: relative;
+            font-size: 40px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            display: inline-block;
+            overflow: visible;
+            filter: contrast(1.2);
+        }
+        
+        .broken-pixel-text {
+            position: relative;
+            z-index: 1;
+            animation: text-shift 4s infinite steps(1);
+        }
+        
+        @keyframes text-shift {
+            0%, 89% { transform: translate(0, 0); }
+            90% { transform: translate(-8px, 3px); filter: blur(1px); }
+            91% { transform: translate(5px, -2px); filter: blur(0); }
+            92% { transform: translate(-3px, 0); filter: blur(2px); }
+            93% { transform: translate(0, 0); filter: blur(0); }
+            94% { transform: translate(7px, 2px); filter: blur(1px); }
+            95% { transform: translate(-6px, -3px); filter: blur(0); }
+            96% { transform: translate(4px, 1px); filter: blur(2px); }
+            97% { transform: translate(0, -1px); filter: blur(0); }
+            98% { transform: translate(-5px, 2px); filter: blur(1px); }
+            99% { transform: translate(0, 0); filter: blur(0); }
+        }
+        
+        .pixel-overlay {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: calc(100% + 20px);
+            height: calc(100% + 20px);
+            z-index: 2;
+            pointer-events: none;
+            overflow: visible;
+        }
+        
+        .dead-pixel {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #fff;
+            z-index: 3;
+            animation: strong-flicker 0.05s infinite steps(1);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+        
+        .stuck-pixel {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            z-index: 3;
+            animation: color-shift 0.07s infinite steps(1);
+            filter: blur(1px);
+        }
+        
+        @keyframes strong-flicker {
+            0%, 40% { opacity: 1; }
+            41%, 70% { opacity: 0; }
+            71%, 100% { opacity: 1; }
+        }
+        
+        @keyframes mega-flicker {
+            0% { opacity: 1; }
+            1% { opacity: 0; }
+            2% { opacity: 1; }
+            3% { opacity: 0; }
+            4% { opacity: 1; }
+            5% { opacity: 0; }
+            6%, 100% { opacity: 1; }
+        }
+        
+        @keyframes color-shift {
+            0% { background-color: #ff0000; filter: blur(0); }
+            20% { background-color: #00ff00; filter: blur(2px); }
+            40% { background-color: #0000ff; filter: blur(0); }
+            60% { background-color: #ffffff; filter: blur(4px); }
+            80% { background-color: #ff00ff; filter: blur(0); }
+            100% { background-color: #ffff00; filter: blur(3px); }
+        }
+        
+        /* Strategic dead pixels with faster flickering */
+        .dead-pixel:nth-child(1) { top: 15%; left: 25%; animation: strong-flicker 0.05s infinite steps(1); }
+        .dead-pixel:nth-child(2) { top: 50%; left: 60%; animation: strong-flicker 0.07s infinite steps(1); }
+        .dead-pixel:nth-child(3) { top: 70%; left: 75%; animation: strong-flicker 0.03s infinite steps(1); }
+        .dead-pixel:nth-child(4) { top: 30%; left: 40%; animation: strong-flicker 0.06s infinite steps(1); }
+        .dead-pixel:nth-child(5) { top: 60%; left: 10%; animation: strong-flicker 0.04s infinite steps(1); }
+        .dead-pixel:nth-child(6) { top: 20%; left: 80%; animation: strong-flicker 0.08s infinite steps(1); }
+        
+        /* Colorful stuck pixels with rapid color changes */
+        .stuck-pixel:nth-child(1) { top: 25%; left: 20%; animation: color-shift 0.1s infinite steps(1); }
+        .stuck-pixel:nth-child(2) { top: 65%; left: 85%; animation: color-shift 0.08s infinite steps(1); }
+        .stuck-pixel:nth-child(3) { top: 40%; left: 50%; animation: color-shift 0.05s infinite steps(1); }
+        .stuck-pixel:nth-child(4) { top: 75%; left: 30%; animation: color-shift 0.12s infinite steps(1); }
+        
+        /* Random horizontal glitch lines that appear frequently */
+        .h-glitch-line {
+            position: absolute;
+            height: 5px;
+            width: 150%;
+            background-color: rgba(255, 255, 255, 0.9);
+            left: -25%;
+            z-index: 5;
+            pointer-events: none;
+            animation: h-glitch 2s infinite steps(1);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+        
+        .h-glitch-line:nth-child(1) {
+            top: 30%;
+            animation-delay: 0.5s;
+        }
+        
+        .h-glitch-line:nth-child(2) {
+            top: 70%;
+            animation-delay: 1.5s;
+        }
+        
+        .h-glitch-line:nth-child(3) {
+            top: 50%;
+            animation-delay: 0.8s;
+        }
+        
+        @keyframes h-glitch {
+            0%, 90%, 100% { opacity: 0; }
+            91%, 95% { opacity: 1; }
+        }
+        
+        /* Major text disruption */
+        .text-disrupt {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary);
+            z-index: 6;
+            mix-blend-mode: difference;
+            animation: text-disrupt 2s infinite steps(1);
+        }
+        
+        @keyframes text-disrupt {
+            0%, 90%, 100% { opacity: 0; }
+            91%, 93%, 95%, 97%, 99% { opacity: 0.8; }
+            92%, 94%, 96%, 98% { opacity: 0; }
+        }
+        
+        /* Text corruption effect */
+        .text-corrupt {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: #ff0000;
+            z-index: 3;
+            animation: text-corrupt 3s infinite steps(1);
+            opacity: 0;
+            font-family: monospace;
+            text-shadow: 0 0 5px #ff0000;
+        }
+        
+        @keyframes text-corrupt {
+            0%, 90%, 100% { opacity: 0; }
+            91%, 99% { opacity: 1; }
+        }
+        
+        /* Multiple vertical screen tears */
+        .v-tear {
+            position: absolute;
+            top: -100%;
+            width: 20px;
+            height: 300%;
+            background-color: transparent;
+            border-left: 1px solid rgba(255, 255, 255, 0.8);
+            border-right: 1px solid rgba(255, 255, 255, 0.8);
+            z-index: 4;
+            animation: v-tear 3s infinite;
+        }
+        
+        .v-tear:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .v-tear:nth-child(2) {
+            animation-delay: 1s;
+        }
+        
+        @keyframes v-tear {
+            0%, 100% { left: -30px; opacity: 0; }
+            90% { left: -30px; opacity: 0; }
+            91% { left: 30%; opacity: 1; }
+            92% { left: 30%; opacity: 1; }
+            93% { left: 120%; opacity: 0; }
+        }
+        
+        /* Screen shake effect */
+        .screen-shake {
+            animation: screen-shake 5s infinite;
+        }
+        
+        @keyframes screen-shake {
+            0%, 95%, 100% { transform: translate(0); }
+            96% { transform: translate(-10px, 5px); }
+            97% { transform: translate(8px, -4px); }
+            98% { transform: translate(-6px, 2px); }
+            99% { transform: translate(4px, -1px); }
+        }
+        
+        /* Full screen glitch */
+        .full-glitch {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 7;
+            background: linear-gradient(transparent 50%, rgba(255, 255, 255, 0.15) 50%);
+            background-size: 100% 4px;
+            animation: full-glitch 4s infinite steps(1);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        @keyframes full-glitch {
+            0%, 93%, 100% { opacity: 0; transform: translateX(0); }
+            94%, 96%, 98% { opacity: 1; transform: translateX(-10px); }
+            95%, 97%, 99% { opacity: 1; transform: translateX(10px); }
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: var(--text);
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            background-color: var(--primary);
+            color: #000;
+        }
+        
+        .auth-links {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: black;
+        }
+        
+        .btn-primary:hover {
+            background-color: #dddddd;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: black;
+        }
+        
+        /* Hero Section */
+        .hero {
+            height: 500px;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("/api/placeholder/1200/500");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent 70%);
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero h1 {
+            font-size: 60px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: white;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+        
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+        
+        /* Server Stats */
+        .server-stats {
+            padding: 50px 0;
+            background-color: var(--bg-light);
+        }
+        
+        .section-title {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            color: var(--primary);
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background-color: var(--primary);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background-color: var(--secondary);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .server-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .server-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .online {
+            background-color: #ffffff;
+            color: #000;
+        }
+        
+        .offline {
+            background-color: #555;
+            color: white;
+        }
+        
+        .stat-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .players-bar {
+            margin-top: 15px;
+            height: 10px;
+            background-color: var(--border);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .players-fill {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 5px;
+        }
+        
+        .gametracker-widget {
+            margin: 15px 0;
+            text-align: center;
+            overflow: hidden;
+            border-radius: 4px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .gametracker-widget img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            transition: transform 0.3s ease;
+        }
+        
+        .gametracker-widget img:hover {
+            transform: scale(1.02);
+        }
+        
+        
+        /* Forum Section */
+        .forum {
+            padding: 50px 0;
+            background-color: var(--bg-dark);
+        }
+        
+        .forum-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .forum-card {
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .forum-header {
+            background-color: var(--secondary);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .forum-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .forum-stats {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .forum-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-muted);
+        }
+        
+        .forum-topics {
+            padding: 0;
+        }
+        
+        .topic-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+        
+        .topic-item:hover {
+            background-color: var(--secondary);
+        }
+        
+        .topic-item:last-child {
+            border-bottom: none;
+        }
+        
+        .topic-info {
+            flex: 1;
+        }
+        
+        .topic-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .topic-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .topic-author {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .author-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .topic-activity {
+            text-align: right;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .activity-time {
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 50px 0;
+            background-color: var(--bg-light);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background-color: var(--secondary);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .feature-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+        
+        .feature-desc {
+            color: var(--text-muted);
+        }
+        
+        /* Rules Section */
+        .rules {
+            padding: 50px 0;
+            background-color: var(--bg-dark);
+        }
+        
+        .rules-list {
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .rule-header {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            text-align: center;
+        }
+        
+        .rule-header h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+        
+        .rule-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .rule-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .rule-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .rule-desc {
+            color: var(--text-muted);
+            padding-left: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .final-note {
+            background-color: var(--secondary);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        /* Price list styling */
+        .price-section {
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .price-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .pricing-category {
+            background-color: var(--primary);
+            color: black;
+            padding: 15px 20px;
+            margin: 0;
+            font-size: 22px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .pricing-category::after {
+            content: '▼';
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+        
+        .pricing-category.active::after {
+            transform: rotate(180deg);
+        }
+        
+        .price-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+        
+        .price-list.active {
+            max-height: 2000px;
+            transition: max-height 1s ease;
+        }
+        
+        .price-list li {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .price-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .price-list li:hover {
+            background-color: var(--secondary);
+        }
+        
+        .price-item {
+            font-weight: 500;
+        }
+        
+        .price-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .limited, .terms {
+            font-size: 14px;
+            color: #ff00ff;
+            margin-left: 5px;
+        }
+        
+        .includes {
+            font-size: 14px;
+            color: var(--accent);
+            margin-left: 5px;
+        }
+        
+        .bundle-list li {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .bundle-header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .bundle-name {
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .bundle-price {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 18px;
+        }
+        
+        .bundle-content {
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        
+        .bundle-discount {
+            margin-top: 8px;
+            font-weight: 600;
+            color: #00ffff;
+        }
+        
+        .payment-info {
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .payment-methods-title {
+            margin: 20px 0 10px;
+            color: var(--primary);
+        }
+        
+        .payment-methods {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 15px 0;
+        }
+        
+        .payment-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: black;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(255, 255, 255, 0.2);
+        }
+        
+        .payment-method {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--secondary);
+            border-radius: 4px;
+        }
+        
+        .payment-thanks {
+            margin-top: 20px;
+            font-style: italic;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--secondary);
+            padding: 50px 0 20px;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-section h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: var(--text-muted);
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .social-link {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            background-color: var(--bg-light);
+            border-radius: 50%;
+            color: var(--text);
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            background-color: var(--primary);
+            color: black;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: var(--bg-light);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-header {
+            background-color: var(--primary);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            color: black;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: black;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            text-align: right;
+            border-top: 1px solid var(--border);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 40px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="broken-pixel-container screen-shake">
+                    <div class="broken-pixel-text">Born2Kill</div>
+                    <div class="pixel-overlay">
+                        <div class="dead-pixel"></div>
+                        <div class="dead-pixel"></div>
+                        <div class="dead-pixel"></div>
+                        <div class="dead-pixel"></div>
+                        <div class="dead-pixel"></div>
+                        <div class="dead-pixel"></div>
+                        <div class="stuck-pixel"></div>
+                        <div class="stuck-pixel"></div>
+                        <div class="stuck-pixel"></div>
+                        <div class="stuck-pixel"></div>
+                        <div class="h-glitch-line"></div>
+                        <div class="h-glitch-line"></div>
+                        <div class="h-glitch-line"></div>
+                        <div class="text-disrupt"></div>
+                        <div class="text-corrupt">B0RN2K1LL.exe</div>
+                        <div class="v-tear"></div>
+                        <div class="v-tear"></div>
+                        <div class="full-glitch"></div>
+                    </div>
+                </div>
+                <div class="nav-links">
+                    <a href="#home" class="active">Home</a>
+                    <a href="#servers">Servers</a>
+                    <a href="#forum">Forum</a>
+                    <a href="#rules">Rules</a>
+                    <a href="#pricing">Pricing</a>
+                </div>
+                <div class="auth-links">
+                    <button class="btn btn-outline">Login</button>
+                    <button class="btn btn-primary">Register</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Born2Kill</h1>
+            <p>The best CS 1.6 Zombie Plague Mod community</p>
+            <button class="btn btn-primary">Join Now</button>
+        </div>
+    </section>
+
+    <!-- Server Stats -->
+    <section id="servers" class="server-stats">
+        <div class="container">
+            <h2 class="section-title">Server Status</h2>
+            <div class="stats-grid">
+                <!-- Server 1 -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="server-name"> [ZP] Born2Kill | Zombie Plague - #1</div>
+                        <div class="server-status online">Online</div>
+                    </div>
+                    <div class="stat-details">
+                        <div class="stat-item">
+                            <span class="stat-label">Mode</span>
+                            <span class="stat-value">Zombie Plague</span>
+                        </div>
+                    </div>
+                    <div class="gametracker-widget">
+                        <a href="https://www.gametracker.com/server_info/zp.born2kill.eu:27015/" target="_blank">
+                            <img src="https://cache.gametracker.com/server_info/zp.born2kill.eu:27015/b_560_95_1.png" border="0" width="560" height="95" alt=""/>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Server 2 -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="server-name">Born2Kill | Classic - #2</div>
+                        <div class="server-status online">Online</div>
+                    </div>
+                    <div class="stat-details">
+                        <div class="stat-item">
+                            <span class="stat-label">Mode</span>
+                            <span class="stat-value">Classic</span>
+                        </div>
+                    </div>
+                    <div class="gametracker-widget">
+                        <a href="https://www.gametracker.com/server_info/cs.born2kill.eu:27015/" target="_blank">
+                            <img src="https://cache.gametracker.com/server_info/cs.born2kill.eu:27015/b_560_95_1.png" border="0" width="560" height="95" alt=""/>
+                        </a>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- Forum Section -->
+    <section id="forum" class="forum">
+        <div class="container">
+            <h2 class="section-title">Forum</h2>
+            <div class="forum-grid">
+                <!-- Announcements -->
+                <div class="forum-card">
+                    <div class="forum-header">
+                        <div class="forum-title">Announcements & News</div>
+                        <div class="forum-stats">
+                            <div class="forum-stat">
+                                <span>Topics:</span>
+                                <strong>24</strong>
+                            </div>
+                            <div class="forum-stat">
+                                <span>Posts:</span>
+                                <strong>142</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="forum-topics">
+                        <li class="topic-item">
+                            <div class="topic-info">
+                                <h3 class="topic-title">New Zombie Survival Mode Available!</h3>
+                                <div class="topic-meta">
+                                    <div class="topic-author">
+                                        <img src="/api/placeholder/20/20" alt="Admin" class="author-avatar">
+                                        <span>ZombieSlayer</span>
+                                    </div>
+                                    <div>16 Mar 2025</div>
+                                </div>
+                            </div>
+                            <div class="topic-activity">
+                                <div>Last reply</div>
+                                <div class="activity-time">Today, 14:35</div>
+                            </div>
+                        </li>
+                        <li class="topic-item">
+                            <div class="topic-info">
+                                <h3 class="topic-title">Weekend Event: Double XP!</h3>
+                                <div class="topic-meta">
+                                    <div class="topic-author">
+                                        <img src="/api/placeholder/20/20" alt="Admin" class="author-avatar">
+                                        <span>AdminB2K</span>
+                                    </div>
+                                    <div>15 Mar 2025</div>
+                                </div>
+                            </div>
+                            <div class="topic-activity">
+                                <div>Last reply</div>
+                                <div class="activity-time">Yesterday, 22:10</div>
+                            </div>
+                        </li>
+                        <li class="topic-item">
+                            <div class="topic-info">
+                                <h3 class="topic-title">Server Update: New Maps!</h3>
+                                <div class="topic-meta">
+                                    <div class="topic-author">
+                                        <img src="/api/placeholder/20/20" alt="Admin" class="author-avatar">
+                                        <span>MapMaker</span>
+                                    </div>
+                                    <div>10 Mar 2025</div>
+                                </div>
+                            </div>
+                            <div class="topic-activity">
+                                <div>Last reply</div>
+                                <div class="activity-time">3 days ago</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- General Discussion -->
+                <div class="forum-card">
+                    <div class="forum-header">
+                        <div class="forum-title">General Discussion</div>
+                        <div class="forum-stats">
+                            <div class="forum-stat">
+                                <span>Topics:</span>
+                                <strong>187</strong>
+                            </div>
+                            <div class="forum-stat">
+                                <span>Posts:</span>
+                                <strong>2436</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="forum-topics">
+                        <li class="topic-item">
+                            <div class="topic-info">
+                                <h3 class="topic-title">What zombie class do you prefer?</h3>
+                                <div class="topic-meta">
+                                    <div class="topic-author">
+                                        <img src="/api/placeholder/20/20" alt="User" class="author-avatar">
+                                        <span>ZombieHunter99</span>
+                                    </div>
+                                    <div>15 Mar 2025</div>
+                                </div>
+                            </div>
+                            <div class="topic-activity">
+                                <div>Last reply</div>
+                                <div class="activity-time">2 hours ago</div>
+                            </div>
+                        </li>
+                        <li class="topic-item">
+                            <div class="topic-info">
+                                <h3 class="topic-title">Tips for new players</h3>
+                                <div class="topic-meta">
+                                    <div class="topic-author">
+                                        <img src="/api/placeholder/20/20" alt="User" class="author-avatar">
+                                        <span>Veteran1337</span>
+                                    </div>
+                                    <div>12 Mar 2025</div>
+                                </div>
+                            </div>
+                            <div class="topic-activity">
+                                <div>Last reply</div>
+                                <div class="activity-time">Yesterday, 18:25</div>
+                            </div>
+                        </li>
+                        <li class="topic-item">
+                            <div class="topic-info">
+                                <h3 class="topic-title">Best weapon to fight bosses</h3>
+                                <div class="topic-meta">
+                                    <div class="topic-author">
+                                        <img src="/api/placeholder/20/20" alt="User" class="author-avatar">
+                                        <span>GunMaster</span>
+                                    </div>
+                                    <div>8 Mar 2025</div>
+                                </div>
+                            </div>
+                            <div class="topic-activity">
+                                <div>Last reply</div>
+                                <div class="activity-time">4 days ago</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🧟</div>
+                    <h3 class="feature-title">Zombie Plague Mod</h3>
+                    <p class="feature-desc">Enjoy the ultimate Zombie Plague experience with custom zombie classes, unique game modes, and exclusive maps.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3 class="feature-title">Level System</h3>
+                    <p class="feature-desc">Earn XP, level up, and unlock new abilities and power-ups for your character.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎮</div>
+                    <h3 class="feature-title">Special Events</h3>
+                    <p class="feature-desc">Participate in weekly events with exclusive rewards, unique challenges, and limited-time modes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rules -->
+    <section id="rules" class="rules">
+        <div class="container">
+            <h2 class="section-title">Server Rules</h2>
+            <div class="rules-list">
+                <div class="rule-header">
+                    <h3>[ZP] Born2Kill | OG Zombie Plague [FreeVIP|FDL|LVL|XP|ZM]</h3>
+                    <p>By playing here, you agree to follow these rules. Violations may result in warnings, kicks, or bans.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h3 class="rule-title">Cheating and Fair Play</h3>
+                    <p class="rule-desc">No Cheats/Exploits: Hacks, aimbots, glitches, or bug abuse are strictly forbidden. Report bugs to admins.</p>
+                    <p class="rule-desc">Play Fair: Everyone deserves a fun, balanced game.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h3 class="rule-title">Team Behavior</h3>
+                    <p class="rule-desc">No Team Harm: Avoid team killing, griefing, or disrupting teammates (e.g., blocking paths, stealing weapons).</p>
+                    <p class="rule-desc">Be a Team Player: Work together to survive.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h3 class="rule-title">Chat and Communication</h3>
+                    <p class="rule-desc">No Spamming/Toxicity: Avoid chat/mic spam, begging, harassment, racism, or hate speech. Respect everyone.</p>
+                    <p class="rule-desc">No Advertising/Impersonation: Promoting other servers or impersonating players/admins is a permanent ban offense.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h3 class="rule-title">Gameplay Balance</h3>
+                    <p class="rule-desc">No Camping in Unreachable Spots: Zombies must have a fair chance to reach humans.</p>
+                    <p class="rule-desc">No Weapon/Item Abuse: Use grenades, lasermines, and items responsibly.</p>
+                    <p class="rule-desc">No Blocking: Don't obstruct doorways or pathways.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h3 class="rule-title">Zombie-Specific Rules</h3>
+                    <p class="rule-desc">No Solo Infection Bombs: Infection bombs must target more than one player.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h3 class="rule-title">Admins and Authority</h3>
+                    <p class="rule-desc">Follow Admins: Admins ensure fair play—cooperate with their instructions.</p>
+                    <p class="rule-desc">Appeals: Use proper channels if punished unfairly. No in-game arguments.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h3 class="rule-title">SVIP Rules</h3>
+                    <p class="rule-desc">Personal Use Only: SVIP items cannot be shared or given to others.</p>
+                    <p class="rule-desc">No Abuse: Misuse of SVIP benefits may lead to status removal, even if purchased.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h3 class="rule-title">General Behavior</h3>
+                    <p class="rule-desc">Keep It Fun: This is a casual server—respect others and enjoy the game.</p>
+                    <p class="rule-desc">No Offensive Language: Racism, sexism, or offensive language results in swift action.</p>
+                </div>
+                
+                <div class="rule-item final-note">
+                    <h3 class="rule-title">Final Note</h3>
+                    <p class="rule-desc">Breaking any of these rules may result in disciplinary actions ranging from warnings to permanent bans.</p>
+                    <p class="rule-desc">Admins have the final say in interpreting these rules.</p>
+                    <p class="rule-desc">Keep the game fun, fair, and respectful for all players.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" class="pricing">
+        <div class="container">
+            <h2 class="section-title">BORN2KILL ZP PRICES</h2>
+            
+            <!-- PACKS PRICE -->
+            <div class="price-section">
+                <h3 class="pricing-category">PACKS PRICE</h3>
+                <ul class="price-list">
+                    <li><span class="price-item">1,000 packs:</span> <span class="price-value">3 €</span></li>
+                    <li><span class="price-item">3,000 packs:</span> <span class="price-value">5 €</span></li>
+                    <li><span class="price-item">5,000 packs:</span> <span class="price-value">10 €</span></li>
+                    <li><span class="price-item">7,500 packs:</span> <span class="price-value">15 €</span></li>
+                    <li><span class="price-item">10,000 packs:</span> <span class="price-value">20 €</span></li>
+                    <li><span class="price-item">15,000 packs:</span> <span class="price-value">25 €</span></li>
+                    <li><span class="price-item">20,000 packs:</span> <span class="price-value">35 €</span></li>
+                </ul>
+            </div>
+            
+            <!-- POINTS PRICE -->
+            <div class="price-section">
+                <h3 class="pricing-category">POINTS PRICE</h3>
+                <ul class="price-list">
+                    <li><span class="price-item">500 points:</span> <span class="price-value">3 €</span></li>
+                    <li><span class="price-item">1,000 points:</span> <span class="price-value">5 €</span></li>
+                    <li><span class="price-item">2,500 points:</span> <span class="price-value">10 €</span></li>
+                    <li><span class="price-item">5,000 points:</span> <span class="price-value">20 €</span></li>
+                    <li><span class="price-item">7,000 points:</span> <span class="price-value">30 €</span></li>
+                    <li><span class="price-item">10,000 points:</span> <span class="price-value">35 €</span></li>
+                </ul>
+            </div>
+            
+            <!-- Premium VIP PRICE -->
+            <div class="price-section">
+                <h3 class="pricing-category">Premium VIP PRICE</h3>
+                <ul class="price-list">
+                    <li><span class="price-item">1 WEEK:</span> <span class="price-value">3 €</span></li>
+                    <li><span class="price-item">2 WEEKS:</span> <span class="price-value">5 €</span></li>
+                    <li><span class="price-item">1 MONTH:</span> <span class="price-value">10 €</span></li>
+                    <li><span class="price-item">PERMANENT:</span> <span class="price-value">50 € <span class="limited">[LIMITED]</span></span></li>
+                </ul>
+            </div>
+            
+            <!-- Level PRICE -->
+            <div class="price-section">
+                <h3 class="pricing-category">Level PRICE</h3>
+                <ul class="price-list">
+                    <li><span class="price-item">5 Levels:</span> <span class="price-value">3 €</span></li>
+                    <li><span class="price-item">10 Levels:</span> <span class="price-value">5 €</span></li>
+                    <li><span class="price-item">20 Levels:</span> <span class="price-value">10 €</span></li>
+                    <li><span class="price-item">30 Levels:</span> <span class="price-value">15 €</span></li>
+                    <li><span class="price-item">40 Levels:</span> <span class="price-value">20 €</span></li>
+                    <li><span class="price-item">50 Levels:</span> <span class="price-value">25 €</span></li>
+                    <li><span class="price-item">70 Levels:</span> <span class="price-value">30 €</span></li>
+                </ul>
+            </div>
+            
+            <!-- OTHER ITEMS PRICE -->
+            <div class="price-section">
+                <h3 class="pricing-category">OTHER ITEMS PRICE</h3>
+                <ul class="price-list">
+                    <li><span class="price-item">Custom Tag:</span> <span class="price-value">5 € or 1x Discord boost</span></li>
+                    <li><span class="price-item">Custom Skin:</span> <span class="price-value">15 € / month</span></li>
+                </ul>
+            </div>
+            
+            <!-- Discord Boosts -->
+            <div class="price-section">
+                <h3 class="pricing-category">Discord Boosts</h3>
+                <ul class="price-list">
+                    <li><span class="price-item">1x Discord boost:</span> <span class="price-value">10 days VIP <span class="limited">[40 boosts MAX]</span></span></li>
+                    <li><span class="price-item">2x Discord boost:</span> <span class="price-value">20 days VIP <span class="limited">[40 boosts MAX]</span></span></li>
+                </ul>
+            </div>
+            
+            <!-- ADMIN RANKS PRICE -->
+            <div class="price-section">
+                <h3 class="pricing-category">ADMIN RANKS PRICE <span class="terms">(Terms and conditions apply)</span></h3>
+                <ul class="price-list">
+                    <li><span class="price-item">Helper:</span> <span class="price-value">5 €/month</span></li>
+                    <li><span class="price-item">Moderator:</span> <span class="price-value">7.5 €/month</span></li>
+                    <li><span class="price-item">Admin:</span> <span class="price-value">10 €/month</span></li>
+                    <li><span class="price-item">Head Admin:</span> <span class="price-value">20 €/month <span class="includes">(includes VIP)</span></span></li>
+                    <li><span class="price-item">Manager:</span> <span class="price-value">30 €/month <span class="includes">(includes VIP)</span></span></li>
+                    <li><span class="price-item">Co-Owner:</span> <span class="price-value">50 €/month <span class="includes">(includes VIP)</span></span></li>
+                    <li><span class="price-item">Owner:</span> <span class="price-value">60 €/month <span class="includes">(includes VIP)</span></span></li>
+                </ul>
+            </div>
+            
+            <!-- B2K BUNDLE PRICE -->
+            <div class="price-section">
+                <h3 class="pricing-category">B2K BUNDLE PRICE</h3>
+                <ul class="price-list bundle-list">
+                    <li>
+                        <div class="bundle-header">
+                            <span class="bundle-name">Carrier:</span>
+                            <span class="bundle-price">30 €</span>
+                        </div>
+                        <div class="bundle-content">
+                            Includes 3000 packs + 1000 points + 20 levels (available until level 70, after extra VIP / packs / points) + VIP 1 month + Helper
+                            <div class="bundle-discount">(-15% normal price)</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="bundle-header">
+                            <span class="bundle-name">Immune:</span>
+                            <span class="bundle-price">50 €</span>
+                        </div>
+                        <div class="bundle-content">
+                            Includes 7500 packs + 2500 points + 30 levels (available until level 70, after extra VIP / packs / points) + VIP 1 months + Moderator
+                            <div class="bundle-discount">(-15% normal price)</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="bundle-header">
+                            <span class="bundle-name">Settler:</span>
+                            <span class="bundle-price">80 €</span>
+                        </div>
+                        <div class="bundle-content">
+                            Includes 15000 packs + 5000 points + 50 levels (available until level 70, after extra VIP / packs / points) + VIP 1 month + Admin
+                            <div class="bundle-discount">(-20% normal price)</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="payment-info">
+                <p>If you are interested in buying something, open a ticket in our Discord server.</p>
+                
+                <h3 class="payment-methods-title">Available Payment Methods:</h3>
+                <ul class="payment-methods">
+                    <li><a href="https://www.paypal.com/paypalme/b2kdedem" target="_blank" class="payment-link">Paypal</a></li>
+                    <li><span class="payment-method">Revolut: @andreipxil</span></li>
+                </ul>
+                
+                <p class="payment-thanks">Thank you for supporting the server as always!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Born2Kill</h3>
+                    <p>The best CS 1.6 Zombie Plague Mod community since 2010.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">F</a>
+                        <a href="#" class="social-link">D</a>
+                        <a href="#" class="social-link">T</a>
+                        <a href="#" class="social-link">Y</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#servers">Servers</a></li>
+                        <li><a href="#forum">Forum</a></li>
+                        <li><a href="#rules">Rules</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Guides</a></li>
+                        <li><a href="#">Downloads</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Discord</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2025 Born2Kill Community. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal (login example) -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Login</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-username" class="form-label">Username</label>
+                        <input type="text" id="login-username" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password" class="form-label">Password</label>
+                        <input type="password" id="login-password" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox"> Remember me
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline modal-close">Cancel</button>
+                <button class="btn btn-primary">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple Modal functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const modalTriggers = document.querySelectorAll('.btn-outline');
+            const modalClose = document.querySelectorAll('.modal-close');
+            const modal = document.getElementById('login-modal');
+            
+            modalTriggers.forEach(trigger => {
+                trigger.addEventListener('click', () => {
+                    modal.classList.add('active');
+                });
+            });
+            
+            modalClose.forEach(close => {
+                close.addEventListener('click', () => {
+                    modal.classList.remove('active');
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+            
+            // Smooth scrolling for navigation
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                        
+                        // Update active nav link
+                        document.querySelectorAll('.nav-links a').forEach(link => {
+                            link.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                    }
+                });
+            });
+            
+            // Highlight active section on scroll
+            window.addEventListener('scroll', () => {
+                const sections = document.querySelectorAll('section');
+                const navLinks = document.querySelectorAll('.nav-links a');
+                
+                let current = '';
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    
+                    if (window.pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+            
+            // Banner reload - refresh GameTracker banners periodically
+            function reloadGameTrackerBanners() {
+                const banners = document.querySelectorAll('.gametracker-widget img');
+                banners.forEach(banner => {
+                    const currentSrc = banner.src;
+                    // Add timestamp to force reload without caching
+                    banner.src = currentSrc.split('?')[0] + '?t=' + new Date().getTime();
+                });
+                
+                // Reload banners every 2 minutes
+                setTimeout(reloadGameTrackerBanners, 120000);
+            }
+            
+            // Start periodic reloading of banners
+            setTimeout(reloadGameTrackerBanners, 120000);
+            
+            // Pricing section accordions
+            const pricingCategories = document.querySelectorAll('.pricing-category');
+            
+            pricingCategories.forEach(category => {
+                category.addEventListener('click', () => {
+                    const priceList = category.nextElementSibling;
+                    
+                    // Toggle the active class for the category
+                    category.classList.toggle('active');
+                    
+                    // Toggle the active class for the price list
+                    priceList.classList.toggle('active');
+                });
+            });
+            
+            // Initially open the first pricing category
+            if (pricingCategories.length > 0) {
+                pricingCategories[0].classList.add('active');
+                pricingCategories[0].nextElementSibling.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
